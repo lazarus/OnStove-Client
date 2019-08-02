@@ -1,0 +1,30 @@
+LIBRARY SGUP_API
+EXPORTS
+	SGUPAPI_GetAuthToken	@1
+	SGUPAPI_GetCurrentAccessToken	@2
+	SGUPAPI_GetMessengerAuthToken	@3
+	SGUPAPI_Init	@4
+	SGUPAPI_RenewAuthToken	@5
+	SGUPAPI_RenewMessengerAuthToken	@6
+	SGUPAPI_RunCallback	@7
+	SGUPAPI_SetCallback	@8
+	SGUPAPI_Term	@9
+	SGUPFriends	@10
+	SGUPIAPI_GetMemberInfo	@11
+	SGUPIAPI_InternalRenewAuthToken	@12
+	SGUPIAPI_MessengerInit	@13
+	SGUPIAPI_MessengerTerm	@14
+	SGUPIAPI_OverlayHostInit	@15
+	SGUPIAPI_OverlayHostTerm	@16
+	SGUPIAPI_SendDuplicateLoginEvent	@17
+	SGUPIAPI_SetCallback	@18
+	SGUPIAPI_SetCallbackDuplicateLoginResult	@19
+	SGUPIAPI_SetCallbackGetMemberInfo	@20
+	SGUPIAPI_SetCallbackInternalRenewAuthToken	@21
+	SGUPIAPI_SetCallbackMessengerConfigUpdate	@22
+	SGUPIAPI_SetCallbackSubscriptReq	@23
+	SGUPIAPI_SetCallbackUpdateAuthToken	@24
+	SGUPMatchMaking	@25
+	SGUPOverlay	@26
+	SGUPPeerToPeer	@27
+	SGUPUser	@28
