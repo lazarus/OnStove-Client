@@ -2,221 +2,300 @@
 //
 
 #include "stdafx.h"
+#include <ctime>
 #include <string>
+#include <iostream>
+#include <fstream>
 #include "OnStove Client.h"
 
 using namespace std;
 
-int32_t SGUPAPI_GetAuthToken(void) {
-	printf("SGUPAPI_GetAuthToken\n");
-	return (int32_t)SGUPLocalClient_GetAuthToken;
+/*
+int (__cdecl *__cdecl SGUPAPI_Init(void))(void)()
+Initializing Discord RPC for appId: xxx.
+Updating Discord RPC.
+void (__cdecl *__cdecl SGUPAPI_SetCallback(void (__cdecl *)(void)))(void)(0x13351190)
+int __cdecl SGUPUser(void)()
+int (__cdecl *__cdecl SGUPAPI_GetAuthToken(void))(int,int,unsigned char)()
+int __cdecl SGUPAPI_RunCallback(void)(void)
+...
+...
+int __cdecl SGUPAPI_RunCallback(void)(void)
+*/
+
+int(*SGUPAPI_Init(void))(void) {
+	printf("%s()\n", __FUNCSIG__);
+
+#ifdef DISCORD
+	// Discord RPC
+	DiscordEventHandlers handlers;
+	memset(&handlers, 0, sizeof(handlers));
+
+	auto appId = "471081044854964225";
+
+	Discord_Initialize(appId, &handlers, 1, "");
+	printf("Initializing Discord RPC for appId: %s.\n", appId);
+
+	DiscordRichPresence discordPresence;
+	memset(&discordPresence, 0, sizeof(discordPresence));
+
+	std::time_t result = std::time(nullptr);
+
+	discordPresence.state = "In-Game";
+	discordPresence.details = "Main Menu";
+	discordPresence.startTimestamp = result;
+	discordPresence.largeImageKey = "ncvaf4a";
+	Discord_UpdatePresence(&discordPresence);
+
+	printf("Updating Discord RPC.\n");
+	// Discord RPC
+#endif // DISCORD
+	return SGUPLocalClient_Init;
 }
-int32_t SGUPLocalClient_GetAuthToken(int32_t str2, int32_t str3, unsigned char a3)
-{
-	printf("SGUPLocalClient_GetAuthToken - %ws, %ws, %d\n", str2, str3, a3);
+int SGUPLocalClient_Init(void) {
+	printf("%s()\n", __FUNCSIG__);
 	return 0;
 }
 
-int32_t SGUPAPI_GetCurrentAccessToken(void) {
-	printf("SGUPAPI_GetCurrentAccessToken\n");
-	return (int32_t)0;
-}
+int(*SGUPAPI_Term(void))(void) {
+	// Terminate
+#ifdef DISCORD
+	Discord_ClearPresence();
+	Discord_Shutdown();
+#endif // DISCORD
 
-int32_t SGUPAPI_GetMessengerAuthToken(void) {
-	printf("SGUPAPI_GetMessengerAuthToken\n");
-	return (int32_t)SGUPLocalClient_GetMessengerAuthToken;
+	printf("%s()\n", __FUNCSIG__);
+	return SGUPLocalClient_Term;
 }
-int32_t SGUPLocalClient_GetMessengerAuthToken(void)
-{
-	printf("SGUPLocalClient_GetMessengerAuthToken\n");
+int SGUPLocalClient_Term(void) {
+	printf("%s()\n", __FUNCSIG__);
 	return 0;
 }
 
-int32_t SGUPAPI_Init(void) {
-	printf("SGUPAPI_Init\n");
-
-	return (int32_t)SGUPLocalClient_Init;
+int(*SGUPAPI_GetAuthToken(void))(int, int, unsigned char) {
+	printf("%s()\n", __FUNCSIG__);
+	return SGUPLocalClient_GetAuthToken;
 }
-int32_t SGUPLocalClient_Init(void)
-{
-	printf("SGUPLocalClient_Init\n");
+int SGUPLocalClient_GetAuthToken(int str2, int str3, unsigned char a3) {
+	printf("%s(%ws, %ws, %d)\n", __FUNCSIG__, str2, str3, a3);
 	return 0;
 }
 
-int32_t SGUPAPI_RenewAuthToken(void) { return (int32_t)SGUPLocalClient_RenewAuthToken; }
-int32_t SGUPLocalClient_RenewAuthToken(int32_t str2, int32_t str3, int32_t str4)
-{
-	printf("SGUPLocalClient_RenewAuthToken - %ws, %ws, %ws\n", str2, str3, str4);
+int SGUPAPI_GetCurrentAccessToken(void) {
+	printf("%s()\n", __FUNCSIG__);
 	return 0;
 }
 
-int32_t SGUPAPI_RenewMessengerAuthToken(void) {
-	return (int32_t)SGUPLocalCleint_RenewMessengerAuthToken;
+int(*SGUPAPI_GetMessengerAuthToken(void))(void) {
+	printf("%s()\n", __FUNCSIG__);
+	return SGUPLocalClient_GetMessengerAuthToken;
 }
-int32_t SGUPLocalCleint_RenewMessengerAuthToken(int32_t str)
-{
-	printf("SGUPLocalCleint_RenewMessengerAuthToken - %ws\n", str);
+int SGUPLocalClient_GetMessengerAuthToken(void) {
+	printf("%s()\n", __FUNCSIG__);
 	return 0;
 }
 
-int32_t SGUPAPI_RunCallback(void) {
-	return (int32_t)SGUPLocalClient_RunCallback;
+int(*SGUPAPI_RenewAuthToken(void))(int, int, int) {
+	printf("%s()\n", __FUNCSIG__);
+	return SGUPLocalClient_RenewAuthToken;
 }
-int32_t SGUPLocalClient_RunCallback(void)
-{
-	printf("SGUPLocalClient_RunCallback\n");
+int SGUPLocalClient_RenewAuthToken(int str2, int str3, int str4) {
+	printf("%s(%ws, %ws, %ws)\n", __FUNCSIG__, str2, str3, str4);
 	return 0;
 }
 
-int32_t SGUPAPI_SetCallback(int32_t result) {
+int(*SGUPAPI_RenewMessengerAuthToken(void))(int) {
+	printf("%s()\n", __FUNCSIG__);
+	return SGUPLocalCleint_RenewMessengerAuthToken;
+}
+int SGUPLocalCleint_RenewMessengerAuthToken(int str) {
+	printf("%s(%ws, %ws, %ws)\n", __FUNCSIG__, str);
+	return 0;
+}
+
+int(*SGUPAPI_RunCallback(void))(void) {
+#ifdef DEBUG
+	// printf("%s()\n", __FUNCSIG__);
+#endif // DEBUG
+	return SGUPLocalClient_RunCallback;
+}
+int SGUPLocalClient_RunCallback(void) {
+	printf("%s()\n", __FUNCSIG__);
+	return 0;
+}
+
+int(*SGUPIAPI_GetMemberInfo(void))(void) {
+	printf("%s()\n", __FUNCSIG__);
+	return SGUPLocalClient_GetMemberInfo;
+}
+int SGUPLocalClient_GetMemberInfo(void) {
+	printf("%s()\n", __FUNCSIG__);
+	return 0;
+}
+
+int(*SGUPIAPI_InternalRenewAuthToken(void))(int, int, int) {
+	printf("%s()\n", __FUNCSIG__);
+	return SGUPLocalClient_InternalRenewAuthToken;
+}
+int SGUPLocalClient_InternalRenewAuthToken(int str2, int str3, int str4) {
+	printf("%s(%ws, %ws, %ws)\n", __FUNCSIG__, str2, str3, str4);
+	return 0;
+}
+
+int(*SGUPIAPI_MessengerInit(void))(void) {
+	printf("%s()\n", __FUNCSIG__);
+	return SGUPLocalClient_MessengerInit;
+}
+int SGUPLocalClient_MessengerInit(void) {
+	printf("%s()\n", __FUNCSIG__);
+	return 0;
+}
+
+int(*SGUPIAPI_MessengerTerm(void))(void) {
+	printf("%s()\n", __FUNCSIG__);
+	return SGUPLocalClient_MessengerTerm;
+}
+int SGUPLocalClient_MessengerTerm(void) {
+	printf("%s()\n", __FUNCSIG__);
+	return 0;
+}
+
+int(*SGUPIAPI_OverlayHostInit(void))(void) {
+	printf("%s()\n", __FUNCSIG__);
+	return SGUPLocalClient_OverlayHostInit;
+}
+int SGUPLocalClient_OverlayHostInit(void) {
+	printf("%s()\n", __FUNCSIG__);
+	return 0;
+}
+
+int(*SGUPIAPI_OverlayHostTerm(void))(void) {
+	printf("%s()\n", __FUNCSIG__);
+	return SGUPLocalClient_OverlayHostTerm;
+}
+int SGUPLocalClient_OverlayHostTerm(void) {
+	printf("%s()\n", __FUNCSIG__);
+	return 0;
+}
+
+int(*SGUPIAPI_SendDuplicateLoginEvent(void))(void) {
+	printf("%s()\n", __FUNCSIG__);
+	return SGUPLocalClient_SendDuplicateLoginEvent;
+}
+int SGUPLocalClient_SendDuplicateLoginEvent(void) {
+	printf("%s()\n", __FUNCSIG__);
+	return 0;
+}
+
+int(*SGUPIAPI_SetCallbackDuplicateLoginResult(void))(int) {
+	printf("%s()\n", __FUNCSIG__);
+	return SGUPLocalClient_SetCallbackDuplicateLoginResult;
+}
+int SGUPLocalClient_SetCallbackDuplicateLoginResult(int a1) {
+	printf("%s(%d)\n", __FUNCSIG__, a1);
+	return 0;
+}
+
+int(*SGUPIAPI_SetCallbackGetMemberInfo(void))(int) {
+	printf("%s()\n", __FUNCSIG__);
+	return SGUPLocalClient_SetCallbackGetMemberInfo;
+}
+int SGUPLocalClient_SetCallbackGetMemberInfo(int a1) {
+	printf("%s(%d)\n", __FUNCSIG__, a1);
+	return 0;
+}
+
+int(*SGUPIAPI_SetCallbackInternalRenewAuthToken(void))(int) {
+	printf("%s()\n", __FUNCSIG__);
+	return SGUPLocalClient_SetCallbackInternalRenewAuthToken;
+}
+int SGUPLocalClient_SetCallbackInternalRenewAuthToken(int a1) {
+	printf("%s(%d)\n", __FUNCSIG__, a1);
+	return 0;
+}
+
+int(*SGUPIAPI_SetCallbackMessengerConfigUpdate(void))(int) {
+	printf("%s()\n", __FUNCSIG__);
+	return SGUPLocalClient_SetCallbackMessengerConfigUpdate;
+}
+int SGUPLocalClient_SetCallbackMessengerConfigUpdate(int a1) {
+	printf("%s(%d)\n", __FUNCSIG__, a1);
+	return 0;
+}
+
+int(*SGUPIAPI_SetCallbackSubscriptReq(void))(int) {
+	printf("%s()\n", __FUNCSIG__);
+	return SGUPLocalClient_SetCallbackSubscriptReq;
+}
+int SGUPLocalClient_SetCallbackSubscriptReq(int a1) {
+	printf("%s(%d)\n", __FUNCSIG__, a1);
+	return 0;
+}
+
+int(*SGUPIAPI_SetCallbackUpdateAuthToken(void))(int) {
+	printf("%s()\n", __FUNCSIG__);
+	return SGUPLocalClient_SetCallbackUpdateAuthToken;
+}
+int SGUPLocalClient_SetCallbackUpdateAuthToken(int a1) {
+	printf("%s(%d)\n", __FUNCSIG__, a1);
+	return 0;
+}
+
+int SGUPAPI_SetCallback(int result) {
+	printf("%s(0x%X)\n", __FUNCSIG__, result);
 	return result;
 }
-
-int32_t SGUPAPI_Term(void) {
-	return (int32_t)SGUPLocalClient_Term;
-}
-int32_t SGUPLocalClient_Term(void)
-{
-	printf("SGUPLocalClient_RunCallback\n");
-	return 0;
-}
-
-int32_t SGUPIAPI_GetMemberInfo(void) { return (int32_t)SGUPIAPI_GetMemberInfo; }
-int32_t SGUPLocalClient_GetMemberInfo(void)
-{
-	printf("SGUPLocalClient_RunCallback\n");
-	return 0;
-}
-
-int32_t SGUPIAPI_InternalRenewAuthToken(void) { return (int32_t)SGUPLocalClient_InternalRenewAuthToken; }
-int32_t SGUPLocalClient_InternalRenewAuthToken(int32_t str2, int32_t str3, int32_t str4)
-{
-	printf("SGUPLocalClient_InternalRenewAuthToken - %ws, %ws, %ws\n", str2, str3, str4);
-	return 0;
-}
-
-int32_t SGUPIAPI_MessengerInit(void) { return (int32_t)SGUPLocalClient_MessengerInit; }
-int32_t SGUPLocalClient_MessengerInit(void)
-{
-	printf("SGUPLocalClient_RunCallback\n");
-	return 0;
-}
-
-int32_t SGUPIAPI_MessengerTerm(void) { return (int32_t)SGUPLocalClient_MessengerTerm; }
-int32_t SGUPLocalClient_MessengerTerm(void)
-{
-	printf("SGUPLocalClient_RunCallback\n");
-	return 0;
-}
-
-int32_t SGUPIAPI_OverlayHostInit(void) { return (int32_t)SGUPLocalClient_OverlayHostInit; }
-int32_t SGUPLocalClient_OverlayHostInit(void)
-{
-	printf("SGUPLocalClient_RunCallback\n");
-	return 0;
-}
-
-int32_t SGUPIAPI_OverlayHostTerm(void) { return (int32_t)SGUPLocalClient_OverlayHostTerm; }
-int32_t SGUPLocalClient_OverlayHostTerm(void)
-{
-	printf("SGUPLocalClient_RunCallback\n");
-	return 0;
-}
-
-int32_t SGUPIAPI_SendDuplicateLoginEvent(void) { return (int32_t)SGUPLocalClient_SendDuplicateLoginEvent; }
-int32_t SGUPLocalClient_SendDuplicateLoginEvent(void)
-{
-	printf("SGUPLocalClient_RunCallback\n");
-	return 0;
-}
-
-int32_t SGUPIAPI_SetCallbackDuplicateLoginResult(void) {
-	printf("SGUPIAPI_SetCallbackDuplicateLoginResult\n");
-	return (int32_t)SGUPLocalClient_SetCallbackDuplicateLoginResult;
-}
-int32_t SGUPLocalClient_SetCallbackDuplicateLoginResult(int32_t a1) {
-	printf("SGUPLocalClient_SetCallbackDuplicateLoginResult\n");
-	return (int32_t)SGUPLocalClient_SetCallbackDuplicateLoginResult;
-}
-
-int32_t SGUPIAPI_SetCallbackGetMemberInfo(void) {
-	printf("SGUPIAPI_SetCallbackGetMemberInfo\n");
-	return (int32_t)SGUPLocalClient_SetCallbackGetMemberInfo;
-}
-int32_t SGUPLocalClient_SetCallbackGetMemberInfo(int32_t a1) {
-	printf("SGUPLocalClient_SetCallbackGetMemberInfo\n");
-	return (int32_t)SGUPLocalClient_SetCallbackGetMemberInfo;
-}
-
-int32_t SGUPIAPI_SetCallbackInternalRenewAuthToken(void) {
-	printf("SGUPIAPI_SetCallbackInternalRenewAuthToken\n");
-	return (int32_t)SGUPLocalClient_SetCallbackInternalRenewAuthToken;
-}
-int32_t SGUPLocalClient_SetCallbackInternalRenewAuthToken(int32_t a1) {
-	printf("SGUPLocalClient_SetCallbackInternalRenewAuthToken\n");
-	return (int32_t)SGUPLocalClient_SetCallbackInternalRenewAuthToken;
-}
-
-int32_t SGUPIAPI_SetCallbackMessengerConfigUpdate(void) {
-	printf("SGUPIAPI_SetCallbackMessengerConfigUpdate\n");
-	return (int32_t)SGUPLocalClient_SetCallbackMessengerConfigUpdate;
-}
-int32_t SGUPLocalClient_SetCallbackMessengerConfigUpdate(int32_t a1) {
-	printf("SGUPLocalClient_SetCallbackMessengerConfigUpdate\n");
-	return (int32_t)SGUPLocalClient_SetCallbackMessengerConfigUpdate;
-}
-
-int32_t SGUPIAPI_SetCallbackSubscriptReq(void) {
-	printf("SGUPIAPI_SetCallbackSubscriptReq\n");
-	return (int32_t)SGUPLocalClient_SetCallbackSubscriptReq;
-}
-int32_t SGUPLocalClient_SetCallbackSubscriptReq(int32_t a1) {
-	printf("SGUPLocalClient_SetCallbackSubscriptReq\n");
-	return (int32_t)SGUPLocalClient_SetCallbackSubscriptReq;
-}
-
-int32_t SGUPIAPI_SetCallbackUpdateAuthToken(void) {
-	printf("SGUPIAPI_SetCallbackUpdateAuthToken\n");
-	return (int32_t)SGUPLocalClient_SetCallbackUpdateAuthToken;
-}
-int32_t SGUPLocalClient_SetCallbackUpdateAuthToken(int32_t a1) {
-	printf("SGUPLocalClient_SetCallbackUpdateAuthToken\n");
-	return (int32_t)SGUPLocalClient_SetCallbackUpdateAuthToken;
-}
-
-int32_t SGUPIAPI_SetCallback(int32_t a1) {
-	int32_t result; // eax
+int(*SGUPIAPI_SetCallback(int a1))(int) {
+	printf("%s(%d)\n", __FUNCSIG__, a1);
+	int result; // eax
 	if (a1 == 0) {
 		return 0;
 	}
-	int32_t v3 = *(int32_t *)(a1 + 4); // 0x10005543
+	int v3 = *(int *)(a1 + 4); // 0x10005543
+
+	printf("callback - %d = %s\n", v3, v3);
+
 	result = v3;
 	if (v3 == 2) {
 		//return function_100012a0(a1, v1);
-		return (int32_t)SGUPLocalClient_SetCallbackSubscriptReq;
+		return SGUPLocalClient_SetCallbackSubscriptReq;
 	}
 	if (v3 == 3) {
 		//return function_100012e0(a1, v1);
-		return (int32_t)SGUPLocalClient_SetCallbackMessengerConfigUpdate;
+		return SGUPLocalClient_SetCallbackMessengerConfigUpdate;
 	}
 	if (v3 == 6) {
 		//return function_10001320(a1, v1);
-		return (int32_t)SGUPLocalClient_SetCallbackGetMemberInfo;
+		return SGUPLocalClient_SetCallbackGetMemberInfo;
 	}
 	if (v3 == 7) {
 		//return function_10001360(a1, v1);
-		return (int32_t)SGUPLocalClient_SetCallbackInternalRenewAuthToken;
+		return SGUPLocalClient_SetCallbackInternalRenewAuthToken;
 	}
 	if (v3 == 8) {
 		//result = function_100013a0(a1, v1);
-		return (int32_t)SGUPLocalClient_SetCallbackDuplicateLoginResult;
+		return SGUPLocalClient_SetCallbackDuplicateLoginResult;
 	}
 	// 0x10005585
-	return result;
+	return 0;
 }
 
-int32_t SGUPFriends(void) { return (int32_t)0; }
-int32_t SGUPMatchMaking(void) { return (int32_t)0; }
-int32_t SGUPOverlay(void) { return (int32_t)0; }
-int32_t SGUPPeerToPeer(void) { return (int32_t)0; }
-int32_t SGUPUser(void) { return (int32_t)0; }
+int SGUPFriends(void) {
+	printf("%s()\n", __FUNCSIG__);
+	return 0;
+}
+int SGUPMatchMaking(void) {
+	printf("%s()\n", __FUNCSIG__);
+	return 0;
+}
+int SGUPOverlay(void) {
+	printf("%s()\n", __FUNCSIG__); return 0;
+}
+int SGUPPeerToPeer(void) {
+	printf("%s()\n", __FUNCSIG__);
+	return 0;
+}
+int SGUPUser(void) {
+	printf("%s()\n", __FUNCSIG__);
+	return 0;
+}
